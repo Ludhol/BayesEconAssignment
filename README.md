@@ -1,2 +1,5 @@
 # BayesEconAssignment
-Review of https://sites.google.com/site/dimitriskorobilis/matlab/code-for-vars
+Review of Dimitris Korobilis's https://sites.google.com/site/dimitriskorobilis/matlab/code-for-vars
+With specific reference to Primiceri. G., (2005). Time varying structural vector autoregressions and monetary policy,
+Carter, C. and Kohn, R. (1994). On Gibbs sampling for state space models and
+Bayesian Econometrics slides by Daniel Buncic @ http://www.danielbuncic.com/ibe.html
