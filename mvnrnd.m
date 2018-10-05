@@ -1,4 +1,4 @@
-function r = mvnrnd(mu,sigma,cases);
+function r = mvnrnd(mu,sigma,cases)
 
 % modified matlab code, lets almost singular matricies, that may be
 % generated at some draws, go through
@@ -16,13 +16,13 @@ function r = mvnrnd(mu,sigma,cases);
 %   $Revision: 2.9 $  $Date: 2000/06/02 16:54:14 $
 
 
-[m1 n1] = size(mu);
+[m1, n1] = size(mu);
 c = max([m1 n1]);
 if m1 .* n1 ~= c %#ok<BDSCA>
    error('Mu must be a vector.');
 end
 
-[m n] = size(sigma);
+[m, n] = size(sigma);
 if m ~= n
    error('Sigma must be square');
 end
@@ -31,7 +31,7 @@ if m ~= c
    error('The length of mu must equal the number of rows in sigma.');
 end
 
-[T p] = chol(sigma);
+[T, p] = chol(sigma);
 if p > 0
    % The input covariance has some type of perfect correlation.
    % If it is positive semi-definite, we can still proceed.

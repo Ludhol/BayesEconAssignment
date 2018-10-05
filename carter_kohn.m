@@ -2,8 +2,10 @@ function [bdraw,log_lik] = carter_kohn(y,Z,Ht,Qt,m,p,t,B0,V0)
 % Carter and Kohn (1994), On Gibbs sampling for state space models.
 % Kalman filter used to extract estimates of the state vector, in the case
 % of drawbeta: B_t
+
 % Parameters from drawbeta:
 % Qt = Qdraw in main code
+% Ht = Ht
 % m = K
 % p = M
 % t = t
@@ -26,6 +28,7 @@ function [bdraw,log_lik] = carter_kohn(y,Z,Ht,Qt,m,p,t,B0,V0)
 % t = t
 % B0 = A_0_prmean(((ii-1)+(ii-3)*(ii-2)/2):ind,:)
 % V0 = A_0_prvar(((ii-1)+(ii-3)*(ii-2)/2):ind,((ii-1)+(ii-3)*(ii-2)/2):ind))
+
 % The idea of it is still the same though, but now we are filtering and drawing states
 % of the matrix A_t. Since A_t is a matrix and this function draws vectors we need to draw
 % each column seperately. Which is why this function is in a loop from 1 to
@@ -48,7 +51,7 @@ log_lik = 0;
 % cfe is uhat_t in slides
 % f is F_t in slides
 % Kalman gain is not expressed explicitly in the code but would be
-% Vp*H'*inv_f, see lines 58 and 59
+% Vp*H'*inv_f, see lines 60 and 61
 for i=1:t
     R = Ht((i-1)*p+1:i*p,:); % Extract rows (i-1)*p+1 to i*p, always p-1 rows
     H = Z((i-1)*p+1:i*p,:); % Same as above but from Z

@@ -7,7 +7,7 @@
 %
 %     Y(t) = B0(t) + B1(t)xY(t-1) + B2(t)xY(t-2) + e(t) 
 % 
-%  with e(t) ~ N(0,SIGMA(t)), and  L(t)' x SIGMA(t) x L(t) = D(t)*D(t),
+%  with e(t) ~ N(0,SIGMA(t)), and  L(t)' x SIGMA(t) x L(t) = D(t)*D(t)',
 %             _                                          _
 %            |    1         0        0       ...       0  |
 %            |  L21(t)      1        0       ...       0  |
@@ -89,7 +89,8 @@ for i = 1:t-tau-p
 end
 
 % Redefine FAVAR variables y, FAVAR = Factor Augmented VAR see koop section
-% 5.3
+% 5.3. Seems like they are just chaning y to exclude the part used for OLS
+% priors
 y = Y(tau+p+1:t,:)';
 yearlab = yearlab(tau+p+1:t);
 % Time series observations

@@ -23,11 +23,15 @@
     end
     % See equation A.3 and A.4 in Primiceri
     yss = log(y2 + 1e-6)';
+    % Since y2 may be small the offset constant 1e-6 is used to make the estimation more robust
     % SVRW2 involves mixtures, see paragraphs below eqn A.4
+    % Sigma (or D) is diagonal MxM (3x3), we draw each of the diagonal
+    % elements using the SWRW2 function
     for j=1:M
         [Sigtdraw(:,j) , statedraw(:,j)] = SVRW2(yss(:,j),Sigtdraw(:,j),... 
             Wdraw(j,:),sigma_prmean(j),sigma_prvar(j,j),1); 
     end
+    
     sigt = exp(.5*Sigtdraw);
     
     e2 = Sigtdraw(2:end,:) - Sigtdraw(1:end-1,:);

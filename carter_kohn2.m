@@ -1,6 +1,28 @@
 function [bdraw,log_lik] = carter_kohn2(y,Z,Ht,Qt,m,p,t,B0,V0,kdraw)
 % Carter and Kohn (1994), On Gibbs sampling for state space models.
 
+% Similar to carter_kohn but with kdraw
+
+% Called by
+% [h,log_lik3] = carter_kohn2(yss1',ones(T,1),vart,sig,1,1,T,sigma_prmean,..
+%   sigma_prvar,TVP_Sigma*ones(T,1));
+% in SVRW2 function
+
+% Output and input variables
+% bdraw = h
+% log_lik = log_lik3
+
+% y = yss1'
+% Z = ones(T,1)
+% Ht = vart             variance of error term in ME
+% Qt = sig = Wdraw(j,:) variance of error term in SE
+% m = 1
+% p = 1
+% t = T
+% B0 = sigma_prmean
+% V0 = sigma_prvar
+% kdraw = TVP_Sigma*ones(T,1)
+
 % Kalman Filter
 bp = B0;
 Vp = V0;
