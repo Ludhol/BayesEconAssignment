@@ -4,6 +4,8 @@ function [bdraw,log_lik] = carter_kohn(y,Z,Ht,Qt,m,p,t,B0,V0)
 % of drawbeta: B_t
 
 % Parameters from drawbeta:
+% y = y
+% Z = Z
 % Qt = Qdraw in main code
 % Ht = Ht
 % m = K

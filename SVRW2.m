@@ -24,8 +24,8 @@
 % Therefore we estimate log(chi^2(1)) using a mixture of 7 normal
 % distributions.
 
-
-function [h, S] = SVRW2(Ystar,h,sig,sigma_prmean,sigma_prvar,TVP_Sigma)
+% Steps based on Kim et al section 3.2
+function [h, S] = SVRW2(Ystar,h,sig,h_prmean,h_prvar,TVP_Sigma)
 
 T = length(h);
 % normal mixture
@@ -40,8 +40,17 @@ sqrtsigi = sqrt(sigi);
 % sample S from a 7-point distrete distribution
 temprand = rand(T,1);
 q = repmat(pi,T,1).*normpdf(repmat(Ystar,1,7),repmat(h,1,7)+repmat(mi,T,1), repmat(sqrtsigi,T,1));
-q = q./repmat(sum(q,2),1,7);
+% one element 1<=i<=7 of one row 1<=j<=173 of q:
+% q(j,i) = pi(i)*normpdf(Ystar(j),h(i)+mi(i),sqrtsigi(i))
+% size(q) = [173 7]
+q = q./repmat(sum(q,2),1,7); % Normalise q between 0 and 1
 S = 7 - sum(repmat(temprand,1,7)<cumsum(q,2),2)+1;
+% cumsum(q,2) sums columns, cumsum([1 2 3],2) = [1 3 6],
+% repmat(temprand,1,7)<cumsum(q,2) returns a binary 173x7 matrix
+% 1 if inequality holds otherwise 0
+% sum(repmat(temprand,1,7)<cumsum(q,2),2) sums the 1s and 0s in a row
+% and thus returns a 173x1 vector
+% elements of temprand and q are between 0 and 1
 
 
 % S is a Tx1 vector of values between 1 and 7, indicating which normal
@@ -54,8 +63,9 @@ for i = 1:T
     vart(1,1,i) = sigi(imix);
     yss1(i,1) = Ystar(i,1) - mi(imix);
 end
+[h,log_lik3] = carter_kohn2(yss1',ones(T,1),vart,sig,1,1,T,h_prmean,h_prvar,TVP_Sigma*ones(T,1));
 % We now have (mixing math and code) a linear and gaussian state space model
-% ME: yss1 = 2h + (e - mi) where (e - mi) ~ N(0, vart)
+% ME: yss1 = h + (e - mi) where (e - mi) ~ N(0, vart)
 % SE: h_t+1 = h_t + eta_t where eta_t ~ N(0, W)
 % This means that we can use a version of carter & kohn to draw h
-[h,log_lik3] = carter_kohn2(yss1',ones(T,1),vart,sig,1,1,T,sigma_prmean,sigma_prvar,TVP_Sigma*ones(T,1));
+

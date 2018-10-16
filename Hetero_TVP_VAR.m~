@@ -149,7 +149,7 @@ h_prvar = 4*eye(M);
 Q_prmean = ((k_Q)^2)*tau*VB_OLS;
 Q_prvar = tau;
 
-% W ~ IG(k2_W*(1+dimension(W))*I_n,(1+dimension(W)))
+% W ~ IW(k2_W*(1+dimension(W))*I_n,(1+dimension(W)))
 W_prmean = ((k_W)^2)*ones(M,1);
 W_prvar = 2;
 
@@ -172,7 +172,7 @@ consQ = 0.0001; % Not sure where these values come from
 consS = 0.0001;
 consSigma = 0.01;
 consW = 0.0001;
-Sigmat = kron(ones(t,1),consSigma*eye(M));   % Initialize Htdraw, a draw from the VAR covariance matrix
+Dt = kron(ones(t,1),consSigma*eye(M));   % Initialize Htdraw, a draw from the VAR covariance matrix
 Sigmatchol = kron(ones(t,1),sqrt(consSigma)*eye(M)); % Cholesky of Htdraw defined above
 Qdraw = consQ*eye(K);   % Initialize Qdraw, a draw from the covariance matrix Q
 Sdraw = consS*eye(numa);  % Initialize Sdraw, a draw from the covariance matrix S
@@ -252,17 +252,28 @@ for irep = 1:nrep + nburn    % GIBBS iterations starts here
     % Then we draw volatility states
     draw_h
     
-
+        % Create the VAR covariance matrix H(t). It holds that:
+    %           A(t) x H(t) x A(t)' = SIGMA(t) x SIGMA(t) '
+    Ht = zeros(M*t,M);
+    Htsd = zeros(M*t,M);
+    for i = 1:t
+        inva = inv(capAt((i-1)*M+1:i*M,:));
+        stem = diag(sigt(i,:));
+        Hsd = inva*stem;
+        Hdraw = Hsd*Hsd';
+        Ht((i-1)*M+1:i*M,:) = Hdraw;  % H(t)
+        Htsd((i-1)*M+1:i*M,:) = Hsd;  % Cholesky of H(t)
+    end
     % Create the VAR covariance matrix H(t). It holds that:
     %           A(t) x H(t) x A(t)' = SIGMA(t) x SIGMA(t) '
     Sigmat = zeros(M*t,M);
     Sigmatsd = zeros(M*t,M);
     for i = 1:t
         inva = inv(capLt((i-1)*M+1:i*M,:));
-        stem = diag(Dt(i,:));
+        stem = diag(Sigmat(i,:));
         Sigmasd = inva*stem;
         Sigmadraw = Sigmasd*Sigmasd';
-        Sigmat((i-1)*M+1:i*M,:) = Sigmadraw;  % H(t)
+        Dt((i-1)*M+1:i*M,:) = Sigmadraw;  % H(t)
         Sigmatsd((i-1)*M+1:i*M,:) = Sigmasd;  % Cholesky of H(t)
     end
     

@@ -1,5 +1,5 @@
     % Btdrawc is a draw of the mean VAR coefficients, B(t)
-    [Btdrawc,log_lik] = carter_kohn(y,Z,Ht,Qdraw,K,M,t,B_0_prmean,B_0_prvar);
+    [Btdrawc,log_lik] = carter_kohn(y,Z,Sigmat,Qdraw,K,M,t,B_0_prmean,B_0_prvar);
     % See Primeceri A.1 step 1
     
     % Accept draw
