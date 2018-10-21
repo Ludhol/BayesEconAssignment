@@ -4,8 +4,8 @@ function [bdraw,log_lik] = carter_kohn2(y,Z,Ht,Qt,m,p,t,B0,V0,kdraw)
 % Similar to carter_kohn but with kdraw
 
 % Called by
-% [h,log_lik3] = carter_kohn2(yss1',ones(T,1),vart,sig,1,1,T,sigma_prmean,..
-%   sigma_prvar,TVP_Sigma*ones(T,1));
+% [[h,log_lik3] = carter_kohn2(yss1',ones(T,1),vart,sig,1,1,T,h_prmean,...
+% h_prvar,TVP_Sigma*ones(T,1));
 % in SVRW2 function
 
 % Output and input variables
@@ -19,8 +19,8 @@ function [bdraw,log_lik] = carter_kohn2(y,Z,Ht,Qt,m,p,t,B0,V0,kdraw)
 % m = 1
 % p = 1
 % t = T
-% B0 = sigma_prmean
-% V0 = sigma_prvar
+% B0 = h_prmean
+% V0 = h_prvar
 % kdraw = TVP_Sigma*ones(T,1)
 
 % Kalman Filter

@@ -1,24 +1,24 @@
 % univariate stochastic volatility with random walk transition eq
 % Function slightly adapted from Joshua CC Chan's function
 
-% Called by 
-% [Sigtdraw(:,j) , statedraw(:,j)] = SVRW2(yss(:,j),Sigtdraw(:,j),... 
-%            Wdraw(j,:),sigma_prmean(j),sigma_prvar(j,j),1);
+% Called by:
+% [htdraw(:,j) , statedraw(:,j)] = SVRW2(yss(:,j),htdraw(:,j),... 
+%           Wdraw(j,:),h_prmean(j),h_prvar(j,j),1); 
 % in draw_sigma
 
 % Output and input variables:
-% h = Sigtdraw(:,j)
+% h = htdraw(:,j)
 % S = statedraw(:,j)
 
 % Ystar = yss(:,j)      dependent variable in ME modified for current SE
-% h = Sigtdraw(:,j)     previous Sigma_j,t (D_j,t) draw
+% h = htdraw(:,j)       previous h_j,t draw
 % sig = Wdraw(j,:)      W is varcovar matrix of eta (error term for current SE)
-% sigma_prmean = sigma_prmean(j), from the OLS in ts_prior
-% sigma_prvar = sigma_prvar(j,j), from the OLS in ts_prior
+% h_prmean = h_prmean(j) from the OLS in ts_prior
+% h_prvar = h_prvar(j,j) from the OLS in ts_prior
 % TVP_Sigma = 1
 
 % Here we are drawing states for
-% ME: yss_t = 2h_t + e_t where e_t ~ log(chi^2(1))
+% ME: yss_t = h_t + e_t where e_t ~ log(chi^2(1))
 % SE: h_t+1 = h_t + eta_t where eta_t ~ N(0, W)
 % Because the ME is non-gaussian we cannot use CK directly.
 % Therefore we estimate log(chi^2(1)) using a mixture of 7 normal
@@ -63,9 +63,10 @@ for i = 1:T
     vart(1,1,i) = sigi(imix);
     yss1(i,1) = Ystar(i,1) - mi(imix);
 end
-[h,log_lik3] = carter_kohn2(yss1',ones(T,1),vart,sig,1,1,T,h_prmean,h_prvar,TVP_Sigma*ones(T,1));
 % We now have (mixing math and code) a linear and gaussian state space model
 % ME: yss1 = h + (e - mi) where (e - mi) ~ N(0, vart)
 % SE: h_t+1 = h_t + eta_t where eta_t ~ N(0, W)
 % This means that we can use a version of carter & kohn to draw h
+[h,log_lik3] = carter_kohn2(yss1',ones(T,1),vart,sig,1,1,T,h_prmean,h_prvar,TVP_Sigma*ones(T,1));
+
 

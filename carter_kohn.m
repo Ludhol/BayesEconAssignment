@@ -6,36 +6,37 @@ function [bdraw,log_lik] = carter_kohn(y,Z,Ht,Qt,m,p,t,B0,V0)
 % Parameters from drawbeta:
 % y = y
 % Z = Z
-% Qt = Qdraw in main code
-% Ht = Ht
+% Qt = Qdraw
+% Ht = Sigmat
 % m = K
 % p = M
 % t = t
 % V0 called B_0_prvar in drawbeta code, also from training sample
 % B0 called B_0_prmean in drawbeta code which comes from the training sample
 
-% When drawing the blocks of A_t in step 2, the names of the ingoing
+% When drawing the blocks of L_t in step 2, the names of the ingoing
 % variables are a bit less workable:
-% [Atblockdraw,log_lik2a] = carter_kohn(yhat(ii,:),Zc(:,1:ii-1),sigma2temp(:,ii),...
-% Sblockdraw{ii-1},sizeS(ii-1),1,t,A_0_prmean(((ii-1)+(ii-3)*(ii-2)/2):ind,:)...
-% ,A_0_prvar(((ii-1)+(ii-3)*(ii-2)/2):ind,((ii-1)+(ii-3)*(ii-2)/2):ind));
+% [Ltblockdraw,log_lik2a] = carter_kohn(yhat(ii,:),Zc(:,1:ii-1),h2temp(:,ii),...
+%            Sblockdraw{ii-1},sizeS(ii-1),1,t,L_0_prmean(((ii-1)+(ii-3)*(ii-2)/2):ind,:)...
+%            ,L_0_prvar(((ii-1)+(ii-3)*(ii-2)/2):ind,((ii-1)+(ii-3)*(ii-2)/2):ind));
+
 
 % This is what we have then:
 % y = yhat(ii,:)
 % Z = Zc(:,1:ii-1)
-% Ht = sigma2temp(:,ii)
+% Ht = h2temp(:,ii)
 % Qt = Sblockdraw{ii-1}
 % m = sizeS(ii-1)
 % p = 1
 % t = t
-% B0 = A_0_prmean(((ii-1)+(ii-3)*(ii-2)/2):ind,:)
-% V0 = A_0_prvar(((ii-1)+(ii-3)*(ii-2)/2):ind,((ii-1)+(ii-3)*(ii-2)/2):ind))
+% B0 = L_0_prmean(((ii-1)+(ii-3)*(ii-2)/2):ind,:)
+% V0 = L_0_prvar(((ii-1)+(ii-3)*(ii-2)/2):ind,((ii-1)+(ii-3)*(ii-2)/2):ind))
 
 % The idea of it is still the same though, but now we are filtering and drawing states
-% of the matrix A_t. Since A_t is a matrix and this function draws vectors we need to draw
-% each column seperately. Which is why this function is in a loop from 1 to
-% M when drawing A_t. A_t is turned into a lower triangular matrix in
-% draw_sigma.
+% of the matrix L_t. Since the measurement equation for L_t is non-linear we need to draw
+% each equation seperately. Which is why this function is in a loop from 1 to
+% M when drawing L_t. L_t is turned into a lower triangular matrix in
+% draw_h.
 
 
 % Initialize values for Kalman Filter

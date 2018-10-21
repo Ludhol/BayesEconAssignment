@@ -2,6 +2,11 @@
 % ------------------------------------------------------------------------------------
 % This code implements the TVP-VAR model as in Primiceri (2005). See also
 % the monograph, Section 4.2 and Section 3.3.2.
+% 
+% Some comments in this code has been created by Anne-Marie Hammond, Sante
+% Carbone and Ludvig Holm?r for an assignment in course 5326 at SSE. This
+% course is held by Daniel Buncic.
+%
 % ************************************************************************************
 % The model is:
 %
@@ -31,8 +36,9 @@
 %   NOTE: 
 %      There are references to equations of Primiceri, "Time Varying Structural Vector
 %      Autoregressions & Monetary Policy",(2005),Review of Economic Studies 72,821-852
-%      for your convenience. The definition of vectors/matrices is also based on this
-%      paper.
+%      for your convenience. The definition of vectors/matrices used to be based on this
+%      paper but has been amended here to fit the definitions in the
+%      monograph.
 % ------------------------------------------------------------------------------------
 
 clear all;
@@ -61,8 +67,8 @@ M=size(Y,2); % M is the dimensionality of Y
 tau = 40; % tau is the size of the training sample
 % tau and training is discussed in koop section 4.1.1 (page 41)
 p = 2; % p is number of lags in the VAR part
-numa = M*(M-1)/2; % Number of lower triangular elements of A_t (other than 0's and 1's)
-%A_t is from Primiceri section 2 eqn (2), used to create diagonalized
+numa = M*(M-1)/2; % Number of lower triangular elements of L_t (other than 0's and 1's)
+%L_t is from Primiceri section 2 eqn (2), used to create diagonalized
 %variance convariance matrices Sigma_t
 % ===================================| VAR EQUATION |==============================
 % Generate lagged Y matrix. This will be part of the X matrix
@@ -124,7 +130,7 @@ sizeS = 1:M; % Size of matrix S
 
 %-------- Now set prior means and variances (_prmean / _prvar)
 % These are the Kalman filter initial conditions for the time-varying
-% parameters B(t), A(t) and (log) SIGMA(t). These are the mean VAR
+% parameters B(t), L(t) and (log) D(t). These are the mean VAR
 % coefficients, the lower-triangular VAR covariances and the diagonal
 % log-volatilities, respectively 
 % See Primeceri page 831
@@ -133,7 +139,7 @@ sizeS = 1:M; % Size of matrix S
 B_0_prmean = B_OLS;
 B_0_prvar = 4*VB_OLS;
 
-% A_0 ~ N(A_OLS, 4Var(A_OLS))
+% L_0 ~ N(A_OLS, 4Var(L_OLS))
 L_0_prmean = L_OLS;
 L_0_prvar = 4*VL_OLS;
 
@@ -229,7 +235,7 @@ for irep = 1:nrep + nburn    % GIBBS iterations starts here
         disp(irep);toc;
     end
     % -----------------------------------------------------------------------------------------
-    %   STEP I: Sample B from p(B|y,A,Sigma,V) (Drawing coefficient states, pp. 844-845)
+    %   STEP I: Sample B from p(B|y,L,D,V) (Drawing coefficient states, pp. 844-845)
     % -----------------------------------------------------------------------------------------
 
     % First we use Carter & Kohn's algorithm to first filter the states of
@@ -238,7 +244,7 @@ for irep = 1:nrep + nburn    % GIBBS iterations starts here
     draw_beta
     
     %-------------------------------------------------------------------------------------------
-    %   STEP II: Draw A(t) from p(At|y,B,Sigma,V) (Drawing coefficient states, p. 845)
+    %   STEP II: Draw A(t) from p(Lt|y,B,D,V) (Drawing coefficient states, p. 845)
     %-------------------------------------------------------------------------------------------
     
     % Then we draw covariance states
@@ -246,15 +252,15 @@ for irep = 1:nrep + nburn    % GIBBS iterations starts here
     
     
     %------------------------------------------------------------------------------------------
-    %   STEP III: Draw diagonal VAR covariance matrix log-SIGMA(t)
+    %   STEP III: Draw diagonal VAR covariance matrix log-D(t)
     %------------------------------------------------------------------------------------------
     
     % Then we draw volatility states
     draw_h
     
 
-    % Create the VAR covariance matrix H(t). It holds that:
-    %           A(t) x H(t) x A(t)' = SIGMA(t) x SIGMA(t) '
+    % Create the VAR covariance matrix SIGMA(t). It holds that:
+    %           L(t) x SIGMA(t) x L(t)' = D(t) x D(t) '
     Sigmat = zeros(M*t,M);
     Sigmatsd = zeros(M*t,M);
     for i = 1:t
