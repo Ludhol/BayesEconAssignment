@@ -174,7 +174,7 @@ end
 
 %========= INITIALIZE MATRICES:
 % Specify covariance matrices for measurement and state equations
-consQ = 0.0001; % Not sure where these values come from
+consQ = 0.0001; % Small values to initialse the Gibbs sampler
 consS = 0.0001;
 consSigma = 0.01;
 consW = 0.0001;
