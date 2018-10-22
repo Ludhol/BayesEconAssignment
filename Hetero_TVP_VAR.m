@@ -104,7 +104,7 @@ t=size(y,2);   % t is now 215 - p - tau = 173
 %----------------------------PRELIMINARIES---------------------------------
 % Set some Gibbs - related preliminaries
 nrep = 5000;  % Number of replications
-nburn = 2000;   % Number of burn-in-draws
+nburn = 500;   % Number of burn-in-draws
 it_print = 100;  %Print in the screen every "it_print"-th iteration
 
 %========= PRIORS:
@@ -190,20 +190,20 @@ for jj=2:M
 end
 Wdraw = consW*ones(M,1);    % Initialize Wdraw, a draw from the covariance matrix W
 Btdraw = zeros(K,t);     % Initialize Btdraw, a draw of the mean VAR coefficients, B(t)
-Ltdraw = zeros(numa,t);  % Initialize Atdraw, a draw of the non 0 or 1 elements of A(t)
-htdraw = zeros(t,M);   % Initialize Sigtdraw, a draw of the log-diagonal of SIGMA(t)
-Dt = kron(ones(t,1),0.01*eye(M));   % Matrix of the exponent of Sigtdraws (SIGMA(t))
+Ltdraw = zeros(numa,t);  % Initialize Ltdraw, a draw of the non 0 or 1 elements of A(t)
+htdraw = zeros(t,M);   % Initialize htdraw, a draw of the log-diagonal of D(t)
+Dt = kron(ones(t,1),0.01*eye(M));   % Matrix of the exponent of htdraws (D(t))
 statedraw = 5*ones(t,M);       % initialize the draw of the indicator variable 
                                % (of 7-component mixture of Normals approximation)
 Zs = kron(ones(t,1),eye(M));
 
 % Storage matrices for posteriors and stuff
 Bt_postmean = zeros(K,t);    % regression coefficients B(t)
-Lt_postmean = zeros(numa,t); % lower triangular matrix A(t)
-Dt_postmean = zeros(t,M);  % diagonal std matrix SIGMA(t)
+Lt_postmean = zeros(numa,t); % lower triangular matrix L(t)
+Dt_postmean = zeros(t,M);  % diagonal std matrix D(t)
 Qmean = zeros(K,K);          % covariance matrix Q of B(t)
-Smean = zeros(numa,numa);    % covariance matrix S of A(t)
-Wmean = zeros(M,1);          % covariance matrix W of SIGMA(t)
+Smean = zeros(numa,numa);    % covariance matrix S of L(t)
+Wmean = zeros(M,1);          % covariance matrix W of D(t)
 
 sigmean = zeros(t,M);    % mean of the diagonal of the VAR covariance matrix
 cormean = zeros(t,numa); % mean of the off-diagonal elements of the VAR cov matrix
@@ -258,7 +258,7 @@ for irep = 1:nrep + nburn    % GIBBS iterations starts here
     % Then we draw volatility states
     draw_h
     
-
+    
     % Create the VAR covariance matrix SIGMA(t). It holds that:
     %           L(t) x SIGMA(t) x L(t)' = D(t) x D(t) '
     Sigmat = zeros(M*t,M);
@@ -268,9 +268,10 @@ for irep = 1:nrep + nburn    % GIBBS iterations starts here
         stem = diag(Dt(i,:));
         Sigmasd = inva*stem;
         Sigmadraw = Sigmasd*Sigmasd';
-        Sigmat((i-1)*M+1:i*M,:) = Sigmadraw;  % H(t)
-        Sigmatsd((i-1)*M+1:i*M,:) = Sigmasd;  % Cholesky of H(t)
+        Sigmat((i-1)*M+1:i*M,:) = Sigmadraw;  % SIGMA(t)
+        Sigmatsd((i-1)*M+1:i*M,:) = Sigmasd;  % Cholesky of SIGMA(t)
     end
+    
     
     %----------------------------SAVE AFTER-BURN-IN DRAWS AND IMPULSE RESPONSES -----------------
     if irep > nburn              
@@ -295,7 +296,7 @@ for irep = 1:nrep + nburn    % GIBBS iterations starts here
         stemp5 = [];
         stemp7 = [];
         for i = 1:t
-            stemp8 = corrvc(Dt((i-1)*M+1:i*M,:));
+            stemp8 = corrvc(Sigmat((i-1)*M+1:i*M,:));
             stemp7a = [];
             ic = 1;
             for j = 1:M
@@ -303,7 +304,7 @@ for irep = 1:nrep + nburn    % GIBBS iterations starts here
                     stemp7a = [stemp7a ; stemp8(j,1:ic)']; %#ok<AGROW>
                     ic = ic+1;
                 end
-                stemp6(j,1) = sqrt(Dt((i-1)*M+j,j));
+                stemp6(j,1) = sqrt(Sigmat((i-1)*M+j,j));
             end
             stemp5 = [stemp5 ; stemp6']; %#ok<AGROW>
             stemp7 = [stemp7 ; stemp7a']; %#ok<AGROW>

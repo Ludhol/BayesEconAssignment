@@ -30,7 +30,7 @@
             Wdraw(j,:),h_prmean(j),h_prvar(j,j),1); 
     end
     
-    sigt = exp(.5*htdraw);
+    Dt = exp(.5*htdraw);
     
     e2 = htdraw(2:end,:) - htdraw(1:end-1,:);
     W1 = W_prvar + t - p - 1;

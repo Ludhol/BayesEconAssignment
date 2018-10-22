@@ -18,16 +18,16 @@
 
                 % ------------Identification code:                
                 % St dev matrix for structural VAR
-                Hsd = Htsd((i-1)*M+1:i*M,1:M);   % First shock is the Cholesky of the VAR covariance
-                diagonal = diag(diag(Hsd));
-                Hsd = inv(diagonal)*Hsd;    % Unit initial shock
+                Sigmasd = Sigmatsd((i-1)*M+1:i*M,1:M);   % First shock is the Cholesky of the VAR covariance
+                diagonal = diag(diag(Sigmasd));
+                Sigmasd = inv(diagonal)*Sigmasd;    % Unit initial shock
                 
                 % Now get impulse responses for 1 through nhor future periods
                 impresp = zeros(M,M*nhor);
-                impresp(1:M,1:M) = Hsd; % First shock is the Cholesky of the VAR covariance
+                impresp(1:M,1:M) = Sigmasd; % First shock is the Cholesky of the VAR covariance
                 bigai = biga;
                 for j = 1:nhor-1
-                    impresp(:,j*M+1:(j+1)*M) = bigj*bigai*bigj'*Hsd;
+                    impresp(:,j*M+1:(j+1)*M) = bigj*bigai*bigj'*Sigmasd;
                     bigai = bigai*biga;
                 end
 
